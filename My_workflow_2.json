@@ -1,0 +1,1462 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        580,
+        1440
+      ],
+      "id": "838564cd-038e-44fb-8b43-4f81e9a7697d",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "4Nrh0nVXJgSA7Kxx",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=Ты — эксперт по информационной безопасности. Твоя задача — **анализировать сообщения пользователей о проблемах или инцидентах в области информационной, сетевой и кибербезопасности**, а затем выдавать **чёткие, практичные рекомендации** по их устранению, а также помогать обезопасить юзера и всё, что он спрашивает, от угроз в сфере информационной безопасности.\n\nПеред тем как приступить к рекомендациям, **обязательно проверяй наличие запросов в инструменте \"subscribes\"** с помощью базы данных в Google Sheets. \n- Если у пользователя есть доступ (поле `requests` больше 0), продолжай с анализом и рекомендациями.\n- Если у пользователя нет запросов (поле `requests` = 0), верни ошибку: \n```json\n{\n  \"error\": \"У вас закончились запросы, необходимо пополнить счёт.\"\n}\n\nПосле выполнения запроса, уменьшай количество доступных запросов (поле `requests` ) на 1 и обновляй информацию в базе данных.\n\n\n\nФормат ответа:\n1. Если запрос пользователя связан с безопасностью, возвращай рекомендации в формате JSON:\n\njson\nКопировать\nРедактировать\n{\n  \"recommendations\": [\n    \"Краткая рекомендация 1\",\n    \"Краткая рекомендация 2\"\n  ]\n}\n2. Если запрос не связан с информационной безопасностью, возвращай:\n\njson\nКопировать\nРедактировать\n{\n  \"error\": \"Сообщение не относится к области информационной безопасности.\"\n}\nОбрабатывай инциденты по следующим категориям:\nУтечки данных:\n\nИспользуй Leak-Lookup, HaveIBeenPwned, dehashed.com, intelligenceX.\n\nРекомендации: ограничение доступа, включение DLP-систем, уведомление затронутых сторон.\n\nОшибки конфигурации и неправильные настройки:\n\nИспользуй сканеры: Shodan, Censys, ZMap, Nmap, Trivy.\n\nРекомендации: настройка ACL, аудит прав, фильтрация IP, ограничение публичного доступа.\n\nСлабая аутентификация / плохие пароли:\n\nПрименение MFA, внедрение политики ротации паролей.\n\nПроверка паролей через HaveIBeenPwned API.\n\nИнструменты: CrowdStrike, Okta, Bitwarden, Hydra.\n\nУязвимые зависимости / библиотеки:\n\nИспользуй: OWASP Dependency-Check, Snyk, npm audit, yarn audit, pip-audit.\n\nРекомендации: обновление до безопасной версии, настройка CI-проверок.\n\nPhishing и social engineering:\n\nАнти-фишинговые фильтры, обучение сотрудников.\n\nНастройка DMARC/DKIM/SPF.\n\nИнструменты: GoPhish, PhishTank, VirusTotal, URLscan.\n\nВредоносное ПО / трояны:\n\nСканы через: ClamAV, ESET, YARA, Any.Run, Hybrid Analysis.\n\nРекомендации: пересборка образов, аудит автозапуска, карантин.\n\nОтсутствие шифрования:\n\nHTTPS везде (Let's Encrypt, Cloudflare), шифрование данных в покое и в пути.\n\nИнструменты: testssl.sh, Qualys SSL Labs.\n\nОшибки API, серверов и облака (AWS, GCP, Azure):\n\nИспользуй инструменты: ScoutSuite, Prowler, PacBot.\n\nРекомендации: включение CloudTrail, ограничение IAM, настройка WAF.\n\nСпецифичные рекомендации для технологий:\nLaravel:\n\nВыполни команду php artisan config:cache для кэширования конфигурации.\n\nЗакрой доступ к .env файлу с помощью веб-сервера.\n\nУстанови в .env APP_DEBUG=false для отключения отладочной информации.\n\nMongoDB:\n\nУбедись, что использованы безопасные настройки bindIp, auth=true.\n\nОбнови MongoDB до LTS версии.\n\nAWS:\n\nВключи CloudTrail, настрой IAM с принципом наименьших привилегий.\n\nИспользуй S3 Block Public Access для защиты данных.\n\nПримечание:\nПри анализе всегда учитывай наличие подписки, используя инструмент subscribes для проверки запроса.\n\nЕсли подписка подтверждена, предоставляй рекомендации. В противном случае, возвращай ошибку о необходимости пополнения счета.\n\n",
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        580,
+        1240
+      ],
+      "id": "30e2957a-50de-4224-9d7d-77677bcca85d",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Switch1').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1000,
+        540
+      ],
+      "id": "306b923e-357f-4ab2-b6ab-78ba173c6d1b",
+      "name": "Send AI Result2",
+      "webhookId": "f861e799-1a26-4937-ac26-193407994574",
+      "credentials": {
+        "telegramApi": {
+          "id": "sOSj7oiFJSjW35c8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Инструмент для получения статистики о утечках во всё мире",
+        "url": "https://haveibeenpwned.com/api/v3/breaches"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        760,
+        680
+      ],
+      "id": "7cb49e3a-aeef-4de8-b2a7-13c3191a2414",
+      "name": "HIBP tool1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        680
+      ],
+      "id": "99196b16-acad-4d98-83d8-9e1b9abe0984",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "4Nrh0nVXJgSA7Kxx",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=Ты — AI-аналитик по кибербезопасности. Каждый день ты готовишь краткую сводку по актуальным утечкам данных в мире.\nИнформацию ищешь на {{ $today }} дату\nИспользуя переданные тебе данные из открытых источников (таблицы, JSON, html), сформируй текстовый отчет в телеграм-стиле.\n\nФормат отчета:\n\n📊 Статистика утечек данных на [сегодняшняя дата]:\n\n— Всего утечек: [число]\n— Всего скомпрометировано аккаунтов: [число]\n— Топ-3 страны:\n  [флаг] [страна]: [число аккаунтов] [Компании]\n— Последняя утечка: [название/дата/тип данных]\n\nОтчет должен быть лаконичным, не более **7** пунктов, и подходить для отправки в Telegram-бота.\n\nЕсли данные частично отсутствуют — аккуратно сообщи об этом.\n\nВыводишь исключительно статистические данные, без воды"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        600,
+        540
+      ],
+      "id": "7b0759c5-59de-4bfe-9307-3e1559f89dbb",
+      "name": "AI Agent4"
+    },
+    {
+      "parameters": {
+        "content": "## Блок последних новостей\n**Double click** to edit me. \n",
+        "height": 680,
+        "width": 1240,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        120,
+        1520
+      ],
+      "typeVersion": 1,
+      "id": "d7a439d6-449f-455f-93c8-356246205259",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        1300
+      ],
+      "id": "7debbcf7-50e7-46fc-9b51-1c04a037691c",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "jsCode": "function formatNews(articles) {\n  if (!articles || articles.length === 0) {\n    return \"⚠️ Нет свежих новостей по запросу.\";\n  }\n\n  const result = articles.map((item, index) => {\n    const title = `*${index + 1}. [${item.title}](${item.url})*`;\n    const description = item.description ? `\\n${item.description}` : '';\n    const published = item.publishedAt\n      ? `\\n_Опубликовано: ${new Date(item.publishedAt).toLocaleDateString('ru-RU')}_`\n      : '';\n    const image = item.image ? `\\n[Изображение](${item.image})` : ''; // безопасная ссылка\n    return `${title}${description}${published}${image}`;\n  });\n\n  return `📰 *Последние новости об утечках данных:*\\n\\n${result.join('\\n\\n')}`;\n}\n\ntry {\n  const data = {\n    output: $input.first().json.output\n  };\n\n  const parsedOuter = JSON.parse(data.output);\n  const articlesArray = JSON.parse(parsedOuter.output);\n\n  return {\n    json: {\n      message: formatNews(articlesArray)\n    }\n  };\n} catch (error) {\n  // Если что-то пошло не так — возвращаем \"как есть\"\n  return {\n    json: {\n        message: $input.first().json.output\n    }\n  };\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        1640
+      ],
+      "id": "980b2a19-df8d-400e-8f48-74fe20a6ad29",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "url": "=https://gnews.io/api/v4/search?q={query}&apikey=dc9cd9039f5c28f12dc16acf1d439a59",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "query",
+              "description": "Поисковый запрос от пользователя",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        540,
+        1880
+      ],
+      "id": "da7c8f09-6321-41d5-b9bc-9cb2be080602",
+      "name": "NewsSearch1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Switch1').item.json.message.from.id }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1180,
+        1640
+      ],
+      "id": "d71e4f45-7a64-4149-baee-e777b05918bf",
+      "name": "Send AI Result3",
+      "webhookId": "f861e799-1a26-4937-ac26-193407994574",
+      "credentials": {
+        "telegramApi": {
+          "id": "sOSj7oiFJSjW35c8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        1880
+      ],
+      "id": "69e12cc5-e8a1-4e6e-9021-36695de2e90c",
+      "name": "OpenAI Chat Model5",
+      "credentials": {
+        "openAiApi": {
+          "id": "4Nrh0nVXJgSA7Kxx",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=Ты — AI-аналитик по утечкам данных. Отвечаешь только на запросы, связанные с утечками: email, логины, IP, пароли, телефоны, домены и пр.\nЕсли запрос не по теме — сразу отклоняешь коротким сообщением: \"Запрос не связан с утечками данных.\"\n\nПроверка данных\nЕсли в запросе содержится потенциальный объект для поиска — ты:\n\nОпределяешь тип (из списка):\n[email_address, username, ipaddress, phone, domain, password, fullname]\n\nВозвращаешь строго JSON:\n\njson\nКопировать\nРедактировать\n{\n  \"type\": \"<тип>\",\n  \"query\": \"<что проверить>\"\n}\nДля поиска вызываешь инструмент Searcher, делающий POST-запрос на:\nhttps://leak-lookup.com/api/stats\nПараметры: type и query.\n\n📰 Новости об утечках\nЕсли пользователь просит новости об утечке [бренд/дата], используй SerpAPI с новостным поиском.\n\nЕсли просит свежие новости — используй newsSearch (GNews API) и HIBPSearcher (HIBP API).\n\nФормируй поисковый запрос с добавлением ключей:\n\"утечка данных\" OR \"взлом\" OR \"слив\" OR \"компрометация\"\n\nПример запроса:\n(Kaspi AND \"утечка данных\") OR \"взлом Kaspi\" OR \"слив Kaspi\"\n\nРезультат всегда возвращается строго в формате:\n\njson\nКопировать\nРедактировать\n{\n  \"output\": \"[{\\\"title\\\":\\\"Заголовок\\\",\\\"url\\\":\\\"https://...\\\",\\\"description\\\":\\\"Описание\\\",\\\"publishedAt\\\":\\\"2025-04-01\\\",\\\"image\\\":\\\"https://...\\\"}, {...}]\"\n}\n",
+          "returnIntermediateSteps": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        380,
+        1580
+      ],
+      "id": "02ea9724-6b5e-4440-b80c-6193a5f2c40c",
+      "name": "AI Agent5"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5cbc8036-7837-44d9-a696-b2fbf0be0522"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fd4e538d-e87d-40ca-80fd-c9ef878e674a",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "Статистика 📊",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "18ddace4-a46d-4d16-95be-f96a8d62842d",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "Мой профиль 💼",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "aa765d28-2f31-47d2-a71e-5839950e54a2",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "Подписка 📋",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5d09081f-2f7f-4e59-bebd-3f6c916193a2",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "Пополнить баланс 💰",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "64a4d021-498e-4e60-bb66-f13963d3f229",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "Последние утечки 🔐",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "72be63e5-0a04-4b0d-9b15-6a4a3a090ae9",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": 6
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        340,
+        1060
+      ],
+      "id": "cc8a7c0c-6ee4-4ea0-bc01-f006b55aa661",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "=Добро пожаловать!",
+        "replyMarkup": "replyKeyboard",
+        "replyKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Последние утечки 🔐",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "Статистика 📊",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Мой профиль 💼",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "Подписка 📋",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "Пополнить баланс 💰",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "replyKeyboardOptions": {
+          "resize_keyboard": true
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1520,
+        -20
+      ],
+      "id": "b7b33c22-6ec0-4ca7-b5fd-73f75160c26b",
+      "name": "Telegram2",
+      "webhookId": "3e129f8c-f39c-4c08-8ed6-2ceac1d7604c",
+      "credentials": {
+        "telegramApi": {
+          "id": "sOSj7oiFJSjW35c8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Subscribers",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "requests": "20",
+            "chatId": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+            "subscribe": "0"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subscribe",
+              "displayName": "subscribe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "requests",
+              "displayName": "requests",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1080,
+        220
+      ],
+      "id": "cd4e8cf8-f7ab-42ee-9304-6cfdf40b4323",
+      "name": "Добавление1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ALBzO0cCbMOFGfiF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+        "message": "Добро пожаловать в оповещатель новых уязвимостей\nПодтвердите что вы не робот (у Вас есть 2 часа)",
+        "responseType": "=approval",
+        "approvalOptions": {
+          "values": {
+            "approveLabel": "✅ Подтвердить"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeAmount": 2
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        900,
+        220
+      ],
+      "id": "24fe1725-d30d-46bb-9ec5-6d3855034578",
+      "name": "Telegram3",
+      "webhookId": "289ebbde-b3a6-4fb9-bdd8-a6031c4b6d1e",
+      "credentials": {
+        "telegramApi": {
+          "id": "sOSj7oiFJSjW35c8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Регистрация\n**Double click** to edit me. \n",
+        "height": 680,
+        "width": 1240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        260,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "2ce87d12-40b9-4e87-a72a-865ef477da36",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d0e98862-de8b-4d33-bb73-abc4e04ad151",
+              "name": "chatId",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        600,
+        0
+      ],
+      "id": "c39e745d-8521-41cd-b037-f38e89c833f1",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d0e98862-de8b-4d33-bb73-abc4e04ad151",
+              "name": "chatId",
+              "value": "={{ $json.chatId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        600,
+        120
+      ],
+      "id": "fbfd6abe-e716-4e41-8752-0c2883d94754",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Subscribers",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "chatId",
+              "lookupValue": "={{ $json.chatId }}"
+            }
+          ]
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        980,
+        0
+      ],
+      "id": "c1d2e11f-3ada-473d-bbce-1089819906f9",
+      "name": "Допустим БД1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ALBzO0cCbMOFGfiF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3b7e25f6-d1e0-4b3d-8504-f78c3aa85822",
+              "leftValue": "={{ $json.chatId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1180,
+        0
+      ],
+      "id": "b2e6e49d-d066-4096-afc6-e0119bb28588",
+      "name": "Условие проверки юзера1"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        120,
+        920
+      ],
+      "id": "b7d19b56-8fb8-4eed-abb6-8d718d2c7018",
+      "name": "Telegram Trigger1",
+      "webhookId": "4b26f9a1-05c7-4538-a5e7-2e9fec314593",
+      "credentials": {
+        "telegramApi": {
+          "id": "sOSj7oiFJSjW35c8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Switch1').item.json.message.from.id }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        1260
+      ],
+      "id": "30308347-7bc7-4bc9-8a95-b07253b2b8b2",
+      "name": "Send AI Result",
+      "webhookId": "f861e799-1a26-4937-ac26-193407994574",
+      "credentials": {
+        "telegramApi": {
+          "id": "sOSj7oiFJSjW35c8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $input.first().json.output;\n\n// Удаляем обёртку ```json и ```\nraw = raw.replace(/^```json\\s*/, '').replace(/```$/, '');\n\nlet message = \"❗ Не удалось обработать рекомендации.\";\n\ntry {\n  // Один парсинг, потому что результат уже объект\n  const data = JSON.parse(raw);\n\n  if (data.recommendations && Array.isArray(data.recommendations)) {\n    const formatted = data.recommendations\n      .map((rec, i) => `${i + 1}. ${rec}`)\n      .join('\\n');\n\n    message = `🛡️ *Рекомендации по безопасности:*\\n\\n${formatted}`;\n  } else if (data.error) {\n    message = `⚠️ ${data.error}`;\n  }\n} catch (err) {\n  message = `❗ Ошибка при парсинге:\\n\\`${err.message}\\``;\n}\n\nreturn {\n  json: {\n    message\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        1260
+      ],
+      "id": "59ee6c99-f16c-4d09-9521-0ac1ed3a39b2",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "для проверки наличия подписки\n",
+        "documentId": {
+          "__rl": true,
+          "value": "1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Subscribers",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "chatId",
+              "lookupValue": "={{ $('Switch1').item.json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        760,
+        1420
+      ],
+      "id": "6e0e8903-d4bd-4bc3-b79e-5dc211740a6a",
+      "name": "subscribes check",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ALBzO0cCbMOFGfiF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "для отнимания запросов",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Subscribers",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatId": "={{ $('Switch1').item.json.message.chat.id }}",
+            "requests": "={{ $fromAI('requests', `Количество запросов`, 'number') -1 }}"
+          },
+          "matchingColumns": [
+            "chatId"
+          ],
+          "schema": [
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "subscriber",
+              "displayName": "subscriber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "requests",
+              "displayName": "requests",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        880,
+        1400
+      ],
+      "id": "70db64c7-c656-4fce-9e12-7c38835adfd4",
+      "name": "Delete 1 request",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ALBzO0cCbMOFGfiF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Subscribers",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "chatId",
+              "lookupValue": "={{ $json.message.from.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        580,
+        840
+      ],
+      "id": "82220268-910b-4f23-9b29-73fbf37b28c2",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ALBzO0cCbMOFGfiF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $input.first().json;\n\n// Формирование красивого текста\nconst formattedData = `\n💼 **Информация о профиле**:\n- **User ID**: ${row.chatId}\n- **Подписка**: ${row.subscribe === 1 ? \"Активна\" : \"Не активна\"}\n- **Количество запросов**: ${row.requests / 2}\n`;\n\n// Возврат результата в виде массива объектов для n8n\nreturn [{\n  json: {\n    message: formattedData\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        840
+      ],
+      "id": "985a42bf-e4b6-4064-b2b7-f0844bd72a7d",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Switch1').item.json.message.from.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        840
+      ],
+      "id": "6606c876-cebc-4da1-bd94-3a1a86d52a5c",
+      "name": "Send AI Result1",
+      "webhookId": "f861e799-1a26-4937-ac26-193407994574",
+      "credentials": {
+        "telegramApi": {
+          "id": "sOSj7oiFJSjW35c8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=🧩 Prompt for User Profile Image Generation\nYou are a visual profile generator.\nYour task is to create a single, clear and stylish image that visually represents the current user profile status.\n\n🧠 Visualization Logic:\nIf subscription is active (subscribe = 1) → use a premium style: gold or vivid border, visual highlights that reflect elevated status.\n\nIf subscription is inactive (subscribe = 0) → use a neutral/gray style, no highlights or premium cues.\n\nRequest count:\n\nShow as either a progress bar or a clear text like: \"Requests remaining: {{ $('Google Sheets').item.json.requests/2 }}\"\n\n📝 Text on the image:\nUser ID: {{ $('Google Sheets').item.json.chatId }}\n\nSubscription: {{ $('Google Sheets').item.json.subscribe === 1 ? \"Active\" : \"Inactive\" }}\n\nRequests: {{ $('Google Sheets').item.json.requests/2 }}\n\nEnsure all text is easily readable, clear and professionally placed on the image.\n\n🎨 Visual Requirements:\nStyle: Minimalist, clean design\n\nFormat: PNG\n\nSize: No larger than 800x600 (optimized for Telegram)\n\nLayout: Acts like an ID badge — compact, structured, visually balanced.\n\n📤 Output:\nGenerate only the image based on the input data.\nDo not include additional comments, captions, or decorations.\nThe image must be strict, clean, and high-quality, with a clear focus on legibility and presentation of the user’s status.",
+        "options": {
+          "quality": "hd",
+          "size": "1024x1024",
+          "style": "natural"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1020,
+        840
+      ],
+      "id": "665eea26-6dbb-4c22-a42f-ac6a76e58fb0",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "4Nrh0nVXJgSA7Kxx",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Switch1').item.json.message.from.id }}",
+        "text": "=***📋Информация о подписке***\n\n***Статус:*** {{ $json.subscribe ===1 ?`Активна`:`Не активна`}}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Приобрести",
+                    "additionalFields": {
+                      "callback_data": "={{ $('Switch1').item.json.message.from.id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        760,
+        1060
+      ],
+      "id": "185d9b8a-01bb-4e6f-a11f-da43f5b15e73",
+      "name": "Telegram",
+      "webhookId": "897ac456-397b-41c1-816e-6201245b2796",
+      "credentials": {
+        "telegramApi": {
+          "id": "sOSj7oiFJSjW35c8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Subscribers",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1X0DmWuBdpgdQRvNU0heSMbw2_zn61Uyi_LYrHstuojM/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "chatId",
+              "lookupValue": "={{ $json.message.from.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        580,
+        1060
+      ],
+      "id": "736b20f5-4ad5-4a0f-9e1d-b9b4661e029a",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ALBzO0cCbMOFGfiF",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HIBP tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent4": {
+      "main": [
+        [
+          {
+            "node": "Send AI Result2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent5",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Send AI Result3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NewsSearch1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent5": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "AI Agent5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Добавление1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram3": {
+      "main": [
+        [
+          {
+            "node": "Добавление1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Допустим БД1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Допустим БД1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Допустим БД1": {
+      "main": [
+        [
+          {
+            "node": "Условие проверки юзера1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Условие проверки юзера1": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send AI Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "subscribes check": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete 1 request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Send AI Result1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4a27bdf3-4080-4714-9248-6d9affff6863",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7e1fa4655be18c4e27de37953d477d98a028bdb4b2a8742b3d3352a99ca8e8a7"
+  },
+  "id": "rMxeddlvDVtSMGGc",
+  "tags": []
+}
